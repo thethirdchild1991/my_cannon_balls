@@ -2,6 +2,7 @@
 #define SCENERUNNER_H
 
 #include <config.hpp>
+#include <Scene.hpp>
 
 #ifdef DEBUG_IO
 #include<iostream>
@@ -64,8 +65,17 @@ public:
         //clean up
     }
 
-    void render(){
+    int render( Scene& scene ){
         //scene render
+        scene.init();
+        while( true ){
+            scene.update();
+            scene.render();
+            glfwSwapBuffers(window);
+        }
+        glfwTerminate();
+        return EXIT_SUCCESS;
+
     }
 
 
