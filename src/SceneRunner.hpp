@@ -75,14 +75,14 @@ public:
         //scene render
         scene.init();
         while( ! glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE) ) {
-            // scene.update();
-            // scene.render();
-            // glfwSwapBuffers(window);
-            // // std::this_thread::sleep_for(std::chrono::milliseconds(10));            
-            glClear( GL_COLOR_BUFFER_BIT );
-            // Draw nothing, see you in tutorial 2 !
-            // Swap buffers
+            scene.update();
+            scene.render();
             glfwSwapBuffers(window);
+            // // std::this_thread::sleep_for(std::chrono::milliseconds(10));            
+            // glClear( GL_COLOR_BUFFER_BIT );
+            // // Draw nothing, see you in tutorial 2 !
+            // // Swap buffers
+            // glfwSwapBuffers(window);
             glfwPollEvents();
         }
         glfwTerminate();
