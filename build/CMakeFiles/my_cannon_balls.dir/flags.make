@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++-7
 CXX_FLAGS = -g   -std=gnu++1z
 
-CXX_DEFINES = -DDEBUG_IO=1 -DGLFW_DLL
+CXX_DEFINES = -DGLFW_DLL
 
 CXX_INCLUDES = -I/home/denis/cpp/my_cannon_balls/GLEW -I/home/denis/cpp/my_cannon_balls/glm -I/home/denis/cpp/my_cannon_balls/glfw3 -I/home/denis/cpp/my_cannon_balls/OpenGL -isystem /usr/local/include 
 

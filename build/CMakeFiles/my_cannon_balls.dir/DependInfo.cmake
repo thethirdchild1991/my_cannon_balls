@@ -12,7 +12,6 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 
 # Preprocessor definitions for this target.
 set(CMAKE_TARGET_DEFINITIONS_CXX
-  "DEBUG_IO=1"
   "GLFW_DLL"
   )
 

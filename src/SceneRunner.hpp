@@ -1,17 +1,17 @@
 #ifndef SCENERUNNER_H
 #define SCENERUNNER_H
 
-#include <config.hpp>
-#include <Scene.hpp>
-
-#ifdef DEBUG_IO
-#include<iostream>
-#endif
-
-#include <GLFW/glfw3.h>
+#include "config.hpp"
+#include "Scene.hpp"
 #include <GL/glew.h>
-// #include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
+// #include <glad/glad.h>
+#ifdef DEBUG_IO
+#include <iostream>
+#include <thread>
+#include <chrono>
+#endif
 
 
 class SceneRunner
@@ -23,14 +23,18 @@ public:
     SceneRunner(const std::string& winTitle, 
     int width = WIN_WIDTH, int height = WIN_HEIGHT, 
     int samples = 0, 
-    GLclampf rst_red = 0.0,  GLclampf rst_green = 0.0, GLclampf rst_blue = 0.0, GLclampf rst_alpha = 0.0 ){
+    GLclampf rst_red = 0.0,  GLclampf rst_green = 0.0, GLclampf rst_blue = 0.5, GLclampf rst_alpha = 1.0 ){
         //do all init stuff
-        if( !glfwInit() ){
+        if( glfwInit() == GLFW_FALSE ){
 #ifdef DEBUG_IO
             std::cout << "GLFW init failed" << std::endl;
             exit( EXIT_FAILURE );
 #endif            
         }
+
+        // Select OpenGL 4.3
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -39,6 +43,7 @@ public:
         if(samples > 0) {
             glfwWindowHint(GLFW_SAMPLES, samples);
         }
+
 
         window = glfwCreateWindow( WIN_WIDTH, WIN_HEIGHT, winTitle.c_str(), NULL, NULL );
         if( ! window ) {
@@ -55,7 +60,8 @@ public:
             glfwTerminate();
             exit(EXIT_FAILURE);
         }
-
+        
+        glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
         glClearColor(rst_red, rst_green, rst_blue, rst_alpha);
 
@@ -65,13 +71,19 @@ public:
         //clean up
     }
 
-    int render( Scene& scene ){
+    int run( Scene& scene ){
         //scene render
         scene.init();
-        while( true ){
-            scene.update();
-            scene.render();
+        while( ! glfwWindowShouldClose(window) && !glfwGetKey(window, GLFW_KEY_ESCAPE) ) {
+            // scene.update();
+            // scene.render();
+            // glfwSwapBuffers(window);
+            // // std::this_thread::sleep_for(std::chrono::milliseconds(10));            
+            glClear( GL_COLOR_BUFFER_BIT );
+            // Draw nothing, see you in tutorial 2 !
+            // Swap buffers
             glfwSwapBuffers(window);
+            glfwPollEvents();
         }
         glfwTerminate();
         return EXIT_SUCCESS;
