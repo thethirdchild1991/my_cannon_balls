@@ -2,9 +2,10 @@
 #define SCENERUNNER_H
 
 #include "config.hpp"
-#include "Scene.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "Scene.hpp"
 
 // #include <glad/glad.h>
 #ifdef DEBUG_IO
@@ -87,7 +88,6 @@ public:
         }
         glfwTerminate();
         return EXIT_SUCCESS;
-
     }
 
 

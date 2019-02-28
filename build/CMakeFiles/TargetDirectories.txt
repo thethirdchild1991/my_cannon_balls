@@ -1,5 +1,0 @@
-/home/denis/cpp/my_cannon_balls/build/CMakeFiles/rebuild_cache.dir
-/home/denis/cpp/my_cannon_balls/build/CMakeFiles/edit_cache.dir
-/home/denis/cpp/my_cannon_balls/build/CMakeFiles/package_source.dir
-/home/denis/cpp/my_cannon_balls/build/CMakeFiles/my_cannon_balls.dir
-/home/denis/cpp/my_cannon_balls/build/CMakeFiles/package.dir

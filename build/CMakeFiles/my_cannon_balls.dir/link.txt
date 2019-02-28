@@ -1,1 +1,0 @@
-/usr/bin/g++-7  -g  -rdynamic CMakeFiles/my_cannon_balls.dir/src/main.cpp.o CMakeFiles/my_cannon_balls.dir/src/Scene.cpp.o CMakeFiles/my_cannon_balls.dir/src/SceneRunner.cpp.o  -o my_cannon_balls -Wl,-rpath,/usr/local/lib -lGLEW /usr/local/lib/libglfw.so.3.3 -lOpenGL 

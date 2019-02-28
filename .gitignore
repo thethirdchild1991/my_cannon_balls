@@ -1,0 +1,8 @@
+
+*.includecache
+
+*.o
+
+build/
+
+\.vscode/
