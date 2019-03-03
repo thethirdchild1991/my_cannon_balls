@@ -15,9 +15,13 @@ private:
     int m_height;
     bool m_animate;
 
+    int vertexCount;
+
     GLuint m_vaoHandle;
     GLuint m_vertShader;
     GLuint m_fragShader;
+
+    
 
 
 public:
@@ -182,9 +186,19 @@ public:
         linking(m_vertShader, m_fragShader);
 
         float positionData[] = {
-                -0.8f, -0.8f, 0.0f,
-                0.8f, -0.8f, 0.0f,
-                0.0f,  0.8f, 0.0f };
+                // -0.8f, -0.8f, 0.0f,
+                // 0.8f, -0.8f, 0.5f,
+                // 0.0f,  0.8f, 0.8f 
+                -1, 0, 0,
+                0, -1, 0,
+                0, 0, 0,
+
+                1, 0, 0,
+                0, 1, 0,
+                0, 0.5, 0
+
+                };
+        vertexCount = sizeof(positionData) / 3;                
         float colorData[] = {
                 1.0f, 0.0f, 0.0f,
                 0.0f, 1.0f, 0.0f,
@@ -197,7 +211,7 @@ public:
         GLuint colorBufferHandle = vboHandles[1];
 
         glBindBuffer(GL_ARRAY_BUFFER, positionBufferHandle);
-        glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), positionData, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(positionData), positionData, GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, colorBufferHandle);
         glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(float), colorData, GL_STATIC_DRAW);
@@ -219,15 +233,12 @@ public:
 
     }
     void update(){}//some time delta update
-    void render(){
-        std::cout << "Scene Render" << std::endl;
+    void render(){        
         glClear(GL_COLOR_BUFFER_BIT);
-
         glBindVertexArray(m_vaoHandle);
-        glDrawArrays(GL_TRIANGLES, 0, 3 );
+        glDrawArrays(GL_TRIANGLES, 0, vertexCount );
         glBindVertexArray(0);
-
-    }//bind data array and draw
+    }
     void resize( int width, int height ) { m_width = width, m_height = height; }
 
     void animate( bool value ) { m_animate = value; }
