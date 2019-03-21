@@ -7,6 +7,7 @@
 
 // #include <glm/glm.hpp>
 #include "SceneRunner.hpp"
+#include "ModelLoader.hpp"
 
 
 GLFWwindow* window;
