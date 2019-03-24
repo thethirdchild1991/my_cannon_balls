@@ -1,5 +1,5 @@
-#ifndef MODEL
-#define MODEL
+#ifndef MODEL_HPP
+#define MODEL_HPP
 
 #include <vector>
 #include <glm/glm.hpp>
@@ -25,6 +25,8 @@ public:
             return addVertex(data);
         if( data_type == OBJ_CMDS_TYPE::VertexNormal)
             return addNormal(data);
+        if( data_type == OBJ_CMDS_TYPE::VertexTexture)            
+            return addVertexTextureCoordinate(data);
         if( data_type == OBJ_CMDS_TYPE::Face)
             return addFace(data);
     }
@@ -62,12 +64,19 @@ private:
             return false;
         m_vertices.emplace_back( data[0], data[1], data[2] );
         return true;
-    }   
+    } 
+    bool addVertexTextureCoordinate( std::vector<double>& data){
+        if( data.size() != 2)
+            return false;
+        m_verticesTexture.emplace_back(data[0], data[1]);        
+        return true;
+    }  
 
 private:
     std::vector<glm::vec3> m_vertices;
     std::vector<glm::vec3> m_normals;
     std::vector<glm::ivec3> m_faces;        
+    std::vector<glm::vec2> m_verticesTexture;
     
 };
 

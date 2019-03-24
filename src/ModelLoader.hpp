@@ -1,14 +1,12 @@
-#ifndef MODELLOADER
-#define MODELLOADER
+#ifndef MODELLOADER_HPP
+#define MODELLOADER_HPP
 
 #include <string>
-#include <iostream>
-#include <experimental/filesystem>
-#include <fstream>
+#include "common.hpp"
 #include <map>
 #include "Model.hpp"
 
-namespace fs = std::experimental::filesystem;
+
 
 class ModelLoader{
 
@@ -22,7 +20,7 @@ public:
     ~ModelLoader(){};
 
 
-    bool load( const std::string& filepath, Model& model ){
+    bool load( const fs::path& filepath, Model& model ){
         std::ifstream in_file(filepath);
         // in_file.open(filepath);
         if(!in_file.is_open()){
