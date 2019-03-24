@@ -3,53 +3,100 @@
 
 #include <string>
 #include <iostream>
+#include <experimental/filesystem>
 #include <fstream>
 #include <map>
 #include "Model.hpp"
 
-enum OBJ_CMDS_KEYS{
-    Vertex,
-    VertexTexture,
-    VertexNormal,
-    Face
-};
+namespace fs = std::experimental::filesystem;
 
 class ModelLoader{
+
+public:    
     ModelLoader(){
-        m_cmds.emplace(OBJ_CMDS_KEYS::Vertex, "v");
-        m_cmds.emplace(OBJ_CMDS_KEYS::VertexTexture, "vt");
-        m_cmds.emplace(OBJ_CMDS_KEYS::VertexNormal, "vn");
-        m_cmds.emplace(OBJ_CMDS_KEYS::Face, "f");
+        m_cmds.emplace(OBJ_CMDS_TYPE::Vertex, "v");
+        m_cmds.emplace(OBJ_CMDS_TYPE::VertexTexture, "vt");
+        m_cmds.emplace(OBJ_CMDS_TYPE::VertexNormal, "vn");
+        m_cmds.emplace(OBJ_CMDS_TYPE::Face, "f");
     };
     ~ModelLoader(){};
 
 
     bool load( const std::string& filepath, Model& model ){
         std::ifstream in_file(filepath);
-        if(!in_file.is_open())
+        // in_file.open(filepath);
+        if(!in_file.is_open()){
+            
             return false;
+        }
         std::string line_to_parse;
+        OBJ_CMDS_TYPE result_type;
+        std::vector<double> result_data;
+
         while( std::getline(in_file, line_to_parse) ) {
-            parse_line(line_to_parse);
+            parse_line(line_to_parse, result_type, result_data);
+            model.addData(result_type, result_data);
+            
         } 
 
-        return false;
+        return true;
     };
 
 private:    
 
-    void parse_line(std::string& line_to_parse){
+    void parse_line(std::string& line_to_parse, OBJ_CMDS_TYPE& result_type, std::vector<double>& result_data){
         std::stringstream iss(line_to_parse);
         std::string word;
         iss >> word;
+
+        std::vector<std::string> vos;
+
+        result_type = OBJ_CMDS_TYPE::NONE;
+        result_data.clear();
         for( auto &cmd : m_cmds ){
-            if(word == cmd){
-                
+            if(word == cmd.second){
+                result_type = cmd.first;
+                while(iss >> word){
+                    vos.emplace_back(word);
+                }
+            }
+        }
+
+        if(result_type == OBJ_CMDS_TYPE::NONE)
+            return;
+
+        if( result_type == OBJ_CMDS_TYPE::Face){
+            for( auto &s : vos){
+                std::size_t string_size = s.size();
+                std::stringstream ss_helper;
+                double double_helper;
+
+
+                //first digit
+                ss_helper << s.front();
+                ss_helper >> double_helper;
+                result_data.emplace_back(double_helper);
+                //second didgit
+                if(string_size == FACE_LINE_STD_LENGTH){
+                    ss_helper << s.at(2);
+                    ss_helper >> double_helper;                        
+                    result_data.emplace_back(double_helper);
+                }else{
+                    result_data.emplace_back(-1);
+                }
+                //third digit
+                ss_helper << s.back();
+                ss_helper >> double_helper;
+                result_data.emplace_back(double_helper);
+            }
+        }else{
+            for(auto &s : vos){
+                result_data.emplace_back(std::stod(s));
             }
         }
     }
 
-    std::map<int,std::string> m_cmds; 
+    std::map<OBJ_CMDS_TYPE,std::string> m_cmds; 
 };
 
 #endif 

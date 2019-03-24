@@ -46,3 +46,5 @@ if(OpenGL_FOUND)
     include_directories(OpenGL)
     target_link_libraries(${target_name} OpenGL)
 endif()
+
+target_link_libraries(${target_name} stdc++fs)
