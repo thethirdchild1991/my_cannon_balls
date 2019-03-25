@@ -2,6 +2,7 @@
 #define SHADER_HPP
 
 #include "common.hpp"
+#include <map>
 
 enum SHADERS{
     Vert,
@@ -16,8 +17,8 @@ class Shader{
         Shader(){
             m_ok = false;
         };
-        Shader( fs::path& vertex_shader_src_path,
-                fs::path& fragment_shader_src_path ){   
+        Shader( const fs::path& vertex_shader_src_path,
+                const fs::path& fragment_shader_src_path ){   
             
             m_ok = false;        
             
@@ -28,17 +29,12 @@ class Shader{
             loadShaderSrc(vertex_shader_src_path, vertexCode );
             loadShaderSrc(fragment_shader_src_path, fragmentCode);
 
-            compiled_shader vertexShader, fragmentShader;
-            compileShader(vertexCode, vertexShader);
-            compileShader(fragmentCode, fragmentShader);
-
-            m_compiled_shaders.emplace_back(vertexShader);
-            m_compiled_shaders.emplace_back(fragmentShader);
+            // compiled_shader vertexShader, fragmentShader;
+            compileShader(vertexCode, m_compiled_shaders, SHADERS::Vert);
+            compileShader(fragmentCode, m_compiled_shaders, SHADERS::Frag);
 
             makeShaderProgram( m_ID, m_compiled_shaders);
 
-            glDeleteShader(vertexShader);
-            glDeleteShader(fragmentShader);
             m_compiled_shaders.clear();
 
             m_ok = true;
@@ -62,23 +58,25 @@ class Shader{
                         
             shaderCode = shaderStream.str();
         };
-        void compileShader( const std::string& shaderCode, compiled_shader& shader) {
-            shader = glCreateShader(GL_VERTEX_SHADER);
+        void compileShader( const std::string& shaderCode, std::map<SHADERS, compiled_shader>& compiled_shaders, SHADERS shader_type) {
+            
+            compiled_shader shader = glCreateShader(GL_VERTEX_SHADER);
             const char* cShaderCode = shaderCode.c_str();
             glShaderSource(shader, 1, &cShaderCode, NULL);
             glCompileShader(shader);
+            compiled_shaders.emplace(shader_type, shader);
         };
-        void makeShaderProgram( shader_program& ID,   std::vector<compiled_shader>& compiled_shaders ){
+        void makeShaderProgram( shader_program& ID, std::map<SHADERS, compiled_shader>& compiled_shaders ){
             ID = glCreateProgram();
             for( auto &sh : compiled_shaders ){
-                glAttachShader(ID, sh);
+                glAttachShader(ID, sh.second);
             }
             glLinkProgram(ID);
         };
     
         shader_program m_ID;
         std::map<SHADERS, fs::path> m_shaders_src_path;
-        std::vector<compiled_shader> m_compiled_shaders;
+        std::map<SHADERS, compiled_shader> m_compiled_shaders;
         bool m_ok;
 
 };

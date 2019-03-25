@@ -6,5 +6,6 @@ namespace fs = std::experimental::filesystem;
 
 #include <iostream>
 #include <fstream>
+#define DEBUG_IO
 
 #endif
