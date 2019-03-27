@@ -5,8 +5,8 @@
 #include <map>
 
 enum SHADERS{
-    Vert,
-    Frag        
+    Vert = GL_VERTEX_SHADER,
+    Frag = GL_FRAGMENT_SHADER        
 };
 using compiled_shader = unsigned int;
 using shader_program = unsigned int;
@@ -35,16 +35,21 @@ class Shader{
 
             makeShaderProgram( m_ID, m_compiled_shaders);
 
-            m_compiled_shaders.clear();
+            // m_compiled_shaders.clear();
 
             m_ok = true;
             
         };
         ~Shader(){
-            m_shaders_src_path.clear();            
+            m_shaders_src_path.clear();  
+            std::cout << "Shader destructor" << std::endl;
         };
 
         const bool isOK() const { return (m_ok == true) ? true : false; }
+
+        void activate(){ 
+            glUseProgram(m_ID);
+        }
         
     
     private:        
@@ -60,7 +65,7 @@ class Shader{
         };
         void compileShader( const std::string& shaderCode, std::map<SHADERS, compiled_shader>& compiled_shaders, SHADERS shader_type) {
             
-            compiled_shader shader = glCreateShader(GL_VERTEX_SHADER);
+            compiled_shader shader = glCreateShader(shader_type);
             const char* cShaderCode = shaderCode.c_str();
             glShaderSource(shader, 1, &cShaderCode, NULL);
             glCompileShader(shader);
@@ -72,6 +77,30 @@ class Shader{
                 glAttachShader(ID, sh.second);
             }
             glLinkProgram(ID);
+
+            // Check for successful linking
+            GLint status;
+            glGetProgramiv( ID, GL_LINK_STATUS, &status );
+            if (GL_FALSE == status) {
+
+                std::cout << "Failed to link shader program!\n";
+
+                GLint logLen;
+                glGetProgramiv( ID, GL_INFO_LOG_LENGTH, &logLen );
+
+                if (logLen > 0) {
+                    char * log = (char *)malloc(logLen);
+
+                    GLsizei written;
+                    glGetProgramInfoLog(ID, logLen, &written, log);
+
+                    std::cout << "Program log: \n%s" << log;
+
+                    free(log);
+                }
+            } else {
+                glUseProgram( ID );
+            }
         };
     
         shader_program m_ID;
