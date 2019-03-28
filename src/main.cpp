@@ -28,7 +28,7 @@ void setupModel( std::vector<Model>& models_vector ){
 	ModelLoader ml_helper;
 	Model model;
 	ml_helper.load(path_to_model, model);
-	models_vector.push_back(model);
+	models_vector.emplace_back(model);
 }
 
 std::unique_ptr<Renderer> setupRenderHelper(){

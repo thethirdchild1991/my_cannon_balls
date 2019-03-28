@@ -29,7 +29,7 @@ public:
         }
         std::string line_to_parse;
         OBJ_CMDS_TYPE result_type;
-        std::vector<double> result_data;
+        std::vector<float> result_data;
 
         while( std::getline(in_file, line_to_parse) ) {
             parse_line(line_to_parse, result_type, result_data);
@@ -42,7 +42,7 @@ public:
 
 private:    
 
-    void parse_line(std::string& line_to_parse, OBJ_CMDS_TYPE& result_type, std::vector<double>& result_data){
+    void parse_line(std::string& line_to_parse, OBJ_CMDS_TYPE& result_type, std::vector<float>& result_data){
         std::stringstream iss(line_to_parse);
         std::string word;
         iss >> word;
@@ -67,25 +67,25 @@ private:
             for( auto &s : vos){
                 std::size_t string_size = s.size();
                 std::stringstream ss_helper;
-                double double_helper;
+                float float_helper;
 
 
                 //first digit
                 ss_helper << s.front();
-                ss_helper >> double_helper;
-                result_data.emplace_back(double_helper);
+                ss_helper >> float_helper;
+                result_data.emplace_back(float_helper);
                 //second didgit
                 if(string_size == FACE_LINE_STD_LENGTH){
                     ss_helper << s.at(2);
-                    ss_helper >> double_helper;                        
-                    result_data.emplace_back(double_helper);
+                    ss_helper >> float_helper;                        
+                    result_data.emplace_back(float_helper);
                 }else{
                     result_data.emplace_back(-1);
                 }
                 //third digit
                 ss_helper << s.back();
-                ss_helper >> double_helper;
-                result_data.emplace_back(double_helper);
+                ss_helper >> float_helper;
+                result_data.emplace_back(float_helper);
             }
         }else{
             for(auto &s : vos){
