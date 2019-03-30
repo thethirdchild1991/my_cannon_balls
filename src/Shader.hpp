@@ -50,6 +50,8 @@ class Shader{
         void activate(){ 
             glUseProgram(m_ID);
         }
+
+        const shader_program getShaderId() const { return m_ID; }
         
     
     private:        

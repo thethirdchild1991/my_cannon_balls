@@ -73,11 +73,16 @@ private:
                 //first digit
                 ss_helper << s.front();
                 ss_helper >> float_helper;
+                ss_helper.clear();
+                
+                
                 result_data.emplace_back(float_helper);
                 //second didgit
                 if(string_size == FACE_LINE_STD_LENGTH){
                     ss_helper << s.at(2);
-                    ss_helper >> float_helper;                        
+                    ss_helper >> float_helper;                                            
+                    ss_helper.clear();
+                    
                     result_data.emplace_back(float_helper);
                 }else{
                     result_data.emplace_back(-1);
@@ -85,8 +90,15 @@ private:
                 //third digit
                 ss_helper << s.back();
                 ss_helper >> float_helper;
+                ss_helper.clear();
+                
                 result_data.emplace_back(float_helper);
             }
+            // std::cout << line_to_parse << std::endl;
+            // for(auto &val:result_data){
+            //     std::cout << val << std::endl;
+            // }
+
         }else{
             for(auto &s : vos){
                 result_data.emplace_back(std::stod(s));

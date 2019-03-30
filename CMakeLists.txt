@@ -16,7 +16,9 @@ add_executable(${target_name}
         src/Scene.hpp
         src/SceneRunner.cpp
         src/SceneRunner.hpp
+        
         )
+include_directories( /home/denis/cpp/stb )        
 
 
 find_package(GLEW REQUIRED)
