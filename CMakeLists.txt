@@ -12,13 +12,16 @@ project(${target_name} VERSION 0.1.0)
 
 add_executable(${target_name} 
         src/main.cpp
-        src/Scene.cpp        
-        src/Scene.hpp
-        src/SceneRunner.cpp
-        src/SceneRunner.hpp
+        # src/Scene.cpp        
+        # src/Scene.hpp
+        # src/SceneRunner.cpp
+        # src/SceneRunner.hpp
         
         )
-include_directories( /home/denis/cpp/stb )        
+include_directories(    /home/denis/cpp/stb
+                        /src
+                    )        
+
 
 
 find_package(GLEW REQUIRED)

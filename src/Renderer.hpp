@@ -9,6 +9,7 @@
 #include "Shader.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include <map>
+#include "Camera.hpp"
 
 
 
@@ -48,7 +49,7 @@ class Renderer{
                 auto shader_id = activateShader();
                 int i = -1;
 
-                glm::mat4 view_mat = glm::mat4(1.0f);
+                // glm::mat4 view_mat = glm::mat4(1.0f);
                 glm::mat4 projection_mat = glm::mat4(1.0f);
 
                 float radius = 10.0f;
@@ -57,14 +58,16 @@ class Renderer{
                 float camZ  = cos(i*glfwGetTime()) * radius;
 
                 glm::vec3 cameraPos = glm::vec3(camX, camY, camZ);
-                glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+                // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
                 // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
 
-                glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+                // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
                 // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
                 // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+                // m_camera.setCamera( cameraPos, cameraTarget, up );
+                m_camera.updatePos(cameraPos);
                 
-                view_mat = glm::lookAt(cameraPos, cameraTarget, up);
+                // view_mat = glm::lookAt(cameraPos, cameraTarget, up);
                 projection_mat = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f);
                 // projection_mat = glm::ortho(0.0f, float(WIN_WIDTH), 0.0f, float(WIN_HEIGHT), -100.1f, 100.0f);
 
@@ -76,7 +79,7 @@ class Renderer{
                     glm::mat4 model_mat = glm::mat4(1.0f);
 
                     model_mat = glm::translate(model_mat, glm::vec3(i*1.0f, i*1.0f, i*1.0f ));
-                    model_mat = glm::rotate(model_mat, static_cast<float>(glfwGetTime()), glm::vec3(1.0f, 1.0f, 1.0f));
+                    model_mat = glm::rotate(model_mat, static_cast<float>(glfwGetTime())*i, glm::vec3(1.0f, 1.0f, 1.0f));
                     model_mat = glm::scale(model_mat, glm::vec3( 0.5 ) );
 
                     // view_mat = glm::translate(view_mat, glm::vec3(0.0f, 0.0f, -3.0f));
@@ -89,7 +92,7 @@ class Renderer{
                     glUniformMatrix4fv(modelformLoc, 1, GL_FALSE, glm::value_ptr(model_mat));
 
                     unsigned int viewformLoc = glGetUniformLocation( shader_id , "view_mat");
-                    glUniformMatrix4fv(viewformLoc, 1, GL_FALSE, glm::value_ptr(view_mat));
+                    glUniformMatrix4fv(viewformLoc, 1, GL_FALSE, glm::value_ptr(m_camera.viewMat()) );
 
                     unsigned int projecitonformLoc = glGetUniformLocation( shader_id , "projection_mat");
                     glUniformMatrix4fv(projecitonformLoc, 1, GL_FALSE, glm::value_ptr(projection_mat));
@@ -198,6 +201,7 @@ class Renderer{
         };
 
         std::vector<Model> m_models;
+        Camera m_camera;
         // std::map<SHADERS, Shader> m_shaders;        
         std::vector<Shader> m_shaders;
         unsigned int m_activeShaderIndex;
