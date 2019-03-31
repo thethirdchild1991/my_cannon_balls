@@ -1,22 +1,23 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#include "Singleton.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-class Camera {
+class Camera : public Singleton<Camera> {
     public:
         // Camera () : m_inited(false) 
         // {};
-        Camera( const glm::vec3& cameraPos = {0.0, 0.0, 3.0},
-                const glm::vec3& cameraFront = {0.0, 0.0, -1.0},
-                const glm::vec3& up = {0.0, 1.0, 0.0}
-        ) : m_cameraPos(cameraPos), 
-            m_cameraFront(cameraFront), 
-            m_up(up),
-            m_viewMat(glm::lookAt(cameraPos, cameraPos + cameraFront, up)),
-            m_inited(true) {};
-        ~Camera(){};
+        // Camera( const glm::vec3& cameraPos = {0.0, 0.0, 3.0},
+        //         const glm::vec3& cameraFront = {0.0, 0.0, -1.0},
+        //         const glm::vec3& up = {0.0, 1.0, 0.0}
+        // ) : m_cameraPos(cameraPos), 
+        //     m_cameraFront(cameraFront), 
+        //     m_up(up),
+        //     m_viewMat(glm::lookAt(cameraPos, cameraPos + cameraFront, up)),
+        //     m_inited(true) {};
+        // ~Camera(){};
 
         void inited(bool value) { m_inited = value; }
         const bool  inited() const { return m_inited; }
@@ -31,7 +32,9 @@ class Camera {
 
         void calcViewMat() { m_viewMat = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_up); }
 
-        const glm::mat4& setCamera( glm::vec3& pos_val, glm::vec3& front_val, glm::vec3& up ){
+        const glm::mat4& setCamera( const glm::vec3& pos_val, 
+                                    const glm::vec3& front_val, 
+                                    const glm::vec3& up ){
             pos(pos_val);
             front(front_val);
             worldUp(up);
@@ -64,4 +67,6 @@ class Camera {
 
         bool m_inited;
 };
+
+
 #endif
