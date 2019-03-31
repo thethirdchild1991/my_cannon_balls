@@ -8,13 +8,13 @@ class Camera {
     public:
         // Camera () : m_inited(false) 
         // {};
-        Camera( const glm::vec3& cameraPos = {0.0, 0.0, -3.0},
-                const glm::vec3& cameraTarget = {0.0, 0.0, 0.0},
+        Camera( const glm::vec3& cameraPos = {0.0, 0.0, 3.0},
+                const glm::vec3& cameraFront = {0.0, 0.0, -1.0},
                 const glm::vec3& up = {0.0, 1.0, 0.0}
         ) : m_cameraPos(cameraPos), 
-            m_cameraTarget(cameraTarget), 
+            m_cameraFront(cameraFront), 
             m_up(up),
-            m_viewMat(glm::lookAt(cameraPos, cameraTarget, up)),
+            m_viewMat(glm::lookAt(cameraPos, cameraPos + cameraFront, up)),
             m_inited(true) {};
         ~Camera(){};
 
@@ -24,14 +24,16 @@ class Camera {
         const glm::mat4& viewMat() const { return m_viewMat; }
 
         void pos(const glm::vec3& val ) { m_cameraPos = glm::vec3(val); }
-        void target(const glm::vec3& val ) { m_cameraTarget = glm::vec3(val); }
+        const glm::vec3&  pos() const { return m_cameraPos; }
+        void front(const glm::vec3& val ) { m_cameraFront = glm::vec3(val); }
         void worldUp(const glm::vec3& up ) { m_up = glm::vec3(up); }
+        const glm::vec3& worldUp() const { return m_up; }
 
-        void calcViewMat() { m_viewMat = glm::lookAt(m_cameraPos, m_cameraTarget, m_up); }
+        void calcViewMat() { m_viewMat = glm::lookAt(m_cameraPos, m_cameraPos + m_cameraFront, m_up); }
 
-        const glm::mat4& setCamera( glm::vec3& pos_val, glm::vec3& target_val, glm::vec3& up ){
+        const glm::mat4& setCamera( glm::vec3& pos_val, glm::vec3& front_val, glm::vec3& up ){
             pos(pos_val);
-            target(target_val);
+            front(front_val);
             worldUp(up);
             calcViewMat();
             inited(true);
@@ -43,15 +45,20 @@ class Camera {
             calcViewMat();
         }
 
-        void updateTarget(const glm::vec3& val){
-            target(val);
+        void updateFront(const glm::vec3& val){
+            front(val);
+            calcViewMat();
+        }
+        void updatePosAndFront( const glm::vec3& valPos, const glm::vec3& valFront ){
+            pos(valPos);
+            front(valFront);
             calcViewMat();
         }
 
     private:
 
         glm::vec3 m_cameraPos;
-        glm::vec3 m_cameraTarget;
+        glm::vec3 m_cameraFront;
         glm::vec3 m_up;
         glm::mat4 m_viewMat;
 

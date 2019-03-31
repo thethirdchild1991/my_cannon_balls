@@ -12,6 +12,64 @@
 #include "Camera.hpp"
 
 
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
+// camera
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+
+bool firstMouse = true;
+float yaw   = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+float pitch =  0.0f;
+float lastX =  800.0f / 2.0;
+float lastY =  600.0 / 2.0;
+float fov   =  45.0f;
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+    lastX = xpos;
+    lastY = ypos;
+
+    float sensitivity = 0.1f; // change this value to your liking
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    yaw += xoffset;
+    pitch += yoffset;
+
+    // make sure that when pitch is out of bounds, screen doesn't get flipped
+    if (pitch > 89.0f)
+        pitch = 89.0f;
+    if (pitch < -89.0f)
+        pitch = -89.0f;
+
+    glm::vec3 front;
+    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+    front.y = sin(glm::radians(pitch));
+    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+    cameraFront = glm::normalize(front);
+}
+
+// glfw: whenever the mouse scroll wheel scrolls, this callback is called
+// ----------------------------------------------------------------------
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (fov >= 1.0f && fov <= 45.0f)
+        fov -= yoffset;
+    if (fov <= 1.0f)
+        fov = 1.0f;
+    if (fov >= 45.0f)
+        fov = 45.0f;
+}
 
 
 class Renderer{
@@ -43,35 +101,48 @@ class Renderer{
 
 
         void render(){
-            while( ! glfwWindowShouldClose(m_window) && !glfwGetKey(m_window, GLFW_KEY_ESCAPE) ) {
+            float deltaTime = 0.0f;                
+            float lastFrame = 0.0f; // Time of last frame                
 
+
+
+            glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+            glfwSetCursorPosCallback(m_window, mouse_callback);
+            glfwSetScrollCallback(m_window, scroll_callback);
+
+
+
+            while( ! glfwWindowShouldClose(m_window)  ) {
+
+                processInput(m_window);                
+                
                 glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
                 auto shader_id = activateShader();
                 int i = -1;
-
-                // glm::mat4 view_mat = glm::mat4(1.0f);
-                glm::mat4 projection_mat = glm::mat4(1.0f);
-
-                float radius = 10.0f;
-                float camX = sin(i*glfwGetTime()) * radius;
-                float camY = sin(i*glfwGetTime()) * radius * 0;
-                float camZ  = cos(i*glfwGetTime()) * radius;
-
-                glm::vec3 cameraPos = glm::vec3(camX, camY, camZ);
-                // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-                // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-                // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-                // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-                // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-                // m_camera.setCamera( cameraPos, cameraTarget, up );
-                m_camera.updatePos(cameraPos);
                 
-                // view_mat = glm::lookAt(cameraPos, cameraTarget, up);
-                projection_mat = glm::perspective(glm::radians(45.0f), float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f);
-                // projection_mat = glm::ortho(0.0f, float(WIN_WIDTH), 0.0f, float(WIN_HEIGHT), -100.1f, 100.0f);
+                glm::mat4 projection_mat = glm::mat4(1.0f);
+                glm::vec3 cameraPos = m_camera.pos();
+                glm::vec3 cameraUp = m_camera.worldUp();
+
+                float currentFrame = glfwGetTime();
+                deltaTime = currentFrame - lastFrame;
+                lastFrame = currentFrame;
+
+                float cameraSpeed = 2.5f * deltaTime;                
+                if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+                    cameraPos += cameraSpeed * cameraFront;
+                if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+                    cameraPos -= cameraSpeed * cameraFront;
+                if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+                    cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+                if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+                    cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;                
 
 
+                m_camera.updatePosAndFront(cameraPos, cameraFront);
+
+                projection_mat = glm::perspective(glm::radians(fov), float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f);
+                
 
                 for(auto &model : m_models){
                     i++;
@@ -82,12 +153,6 @@ class Renderer{
                     model_mat = glm::rotate(model_mat, static_cast<float>(glfwGetTime())*i, glm::vec3(1.0f, 1.0f, 1.0f));
                     model_mat = glm::scale(model_mat, glm::vec3( 0.5 ) );
 
-                    // view_mat = glm::translate(view_mat, glm::vec3(0.0f, 0.0f, -3.0f));
-
-                    // glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                    
-                    
-
                     unsigned int modelformLoc = glGetUniformLocation( shader_id , "model_mat");
                     glUniformMatrix4fv(modelformLoc, 1, GL_FALSE, glm::value_ptr(model_mat));
 
@@ -96,35 +161,13 @@ class Renderer{
 
                     unsigned int projecitonformLoc = glGetUniformLocation( shader_id , "projection_mat");
                     glUniformMatrix4fv(projecitonformLoc, 1, GL_FALSE, glm::value_ptr(projection_mat));
+                   
                     
-
-                    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-                    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-                    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-
-                    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-                    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-                    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-
-                    // glm::mat4 view;
-                    // view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-                    // glm::vec3(0.0f, 0.0f, 0.0f),
-                    // glm::vec3(0.0f, 1.0f, 0.0f));
-
-                    
-                    
-                    // model.activate(); 
-                    // glDrawArrays(GL_TRIANGLES, 0, 3);
-                    // glBindVertexArray(0); 
                     glEnable(GL_DEPTH_TEST);
                     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
                     glDrawElements(GL_TRIANGLES, model.indicesCount(), GL_UNSIGNED_INT, 0);
                 }
                 
-
-                // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
-                // -------------------------------------------------------------------------------
                 glfwSwapBuffers(m_window);
                 glfwPollEvents();
             }
@@ -200,6 +243,11 @@ class Renderer{
 
         };
 
+        void processInput(GLFWwindow *window) {
+            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+                glfwSetWindowShouldClose(window, true);
+        }
+
         std::vector<Model> m_models;
         Camera m_camera;
         // std::map<SHADERS, Shader> m_shaders;        
@@ -208,6 +256,10 @@ class Renderer{
 
         GLFWwindow * m_window;
         int fbw, fbh;
+
+
+
+
 };
 
 #endif
