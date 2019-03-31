@@ -109,8 +109,9 @@ class Renderer{
             glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
             glfwSetCursorPosCallback(m_window, mouse_callback);
             glfwSetScrollCallback(m_window, scroll_callback);
+            
 
-            Camera::instance().setCamera(   {0.0, 0.0, 3.0},
+            Singleton<Camera>::instance().setCamera(   {0.0, 0.0, 3.0},
                                             {0.0, 0.0, -1.0},
                                             {0.0, 1.0, 0.0} );
 
@@ -124,8 +125,8 @@ class Renderer{
                 
                 
                 glm::mat4 projection_mat = glm::mat4(1.0f);
-                glm::vec3 cameraPos = Camera::instance().pos();
-                glm::vec3 cameraUp = Camera::instance().worldUp();
+                glm::vec3 cameraPos = Singleton<Camera>::instance().pos();
+                glm::vec3 cameraUp = Singleton<Camera>::instance().worldUp();
 
                 float currentFrame = glfwGetTime();
                 deltaTime = currentFrame - lastFrame;
@@ -142,7 +143,7 @@ class Renderer{
                     cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;                
 
 
-                Camera::instance().updatePosAndFront(cameraPos, cameraFront);
+                Singleton<Camera>::instance().updatePosAndFront(cameraPos, cameraFront);
 
                 projection_mat = glm::perspective(glm::radians(fov), float(WIN_WIDTH) / float(WIN_HEIGHT), 0.1f, 100.0f);
                 
@@ -160,7 +161,7 @@ class Renderer{
                     glUniformMatrix4fv(modelformLoc, 1, GL_FALSE, glm::value_ptr(model_mat));
 
                     unsigned int viewformLoc = glGetUniformLocation( shader_id , "view_mat");
-                    glUniformMatrix4fv(viewformLoc, 1, GL_FALSE, glm::value_ptr(Camera::instance().viewMat()) );
+                    glUniformMatrix4fv(viewformLoc, 1, GL_FALSE, glm::value_ptr(Singleton<Camera>::instance().viewMat()) );
 
                     unsigned int projecitonformLoc = glGetUniformLocation( shader_id , "projection_mat");
                     glUniformMatrix4fv(projecitonformLoc, 1, GL_FALSE, glm::value_ptr(projection_mat));
