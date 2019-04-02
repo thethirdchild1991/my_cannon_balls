@@ -12,6 +12,7 @@
 #include "ModelLoader.hpp"
 #include <map>
 #include <memory>
+#include "Game.hpp"
 // #include "Singleton.hpp"
 // #include "stb_image_include.h"
 
@@ -48,6 +49,8 @@ int main( void )
 	// return m_runner.run( *scene );
 	// int width, height, nrChannels;
 	// unsigned char *data = stbi_load("/home/denis/blender_study/cube_texture.jpg", &width, &height, &nrChannels, 0);
+
+	Game::instance();
 
 
 	std::vector<Model> models_vector;	
